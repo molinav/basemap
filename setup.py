@@ -121,9 +121,10 @@ if mode and "sdist" in sys.argv[1:]:
     raise ValueError("setup option --mode incompatible with sdist")
 
 # Get the basemap data files.
-data_folder = os.path.join("lib", "mpl_toolkits", "basemap", "data")
+data_folder = os.path.join("lib", "mpl_toolkits", "basemap_data")
 data_pattern = os.path.join(data_folder, "*")
 data_files = sorted(map(os.path.basename, glob.glob(data_pattern)))
+data_files = [item for item in data_files if not item.endswith(".py")]
 
 # Define default setup parameters.
 namespace_packages = [
@@ -135,7 +136,7 @@ packages = [
 ]
 package_dirs = {
     "mpl_toolkits.basemap": "lib/mpl_toolkits/basemap",
-    "mpl_toolkits.basemap_data": "lib/mpl_toolkits/basemap/data"
+    "mpl_toolkits.basemap_data": data_folder,
 }
 package_data = {
     "mpl_toolkits.basemap_data":
