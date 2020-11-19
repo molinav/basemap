@@ -61,7 +61,14 @@ if 'BASEMAPDATA' in os.environ:
     if not os.path.isdir(basemap_datadir):
         raise RuntimeError('Path in environment BASEMAPDATA not a directory')
 else:
-    basemap_datadir = os.sep.join([os.path.dirname(__file__), 'data'])
+    try:
+        from mpl_toolkits import basemap_data
+        basemap_datadir = basemap_data.__path__._path[0]
+    except ImportError as err:
+        basemap_datadir = os.sep.join([os.path.dirname(__file__), "data"])
+        if not os.path.exists(basemap_datadir):
+            err.args = ("No module named basemap_data",)
+            raise
 
 __version__ = '1.3.0'
 

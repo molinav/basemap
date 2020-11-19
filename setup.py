@@ -121,7 +121,8 @@ if mode and "sdist" in sys.argv[1:]:
     raise ValueError("setup option --mode incompatible with sdist")
 
 # Get the basemap data files.
-data_pattern = os.path.join("lib", "mpl_toolkits", "basemap", "data", "*")
+data_folder = os.path.join("lib", "mpl_toolkits", "basemap", "data")
+data_pattern = os.path.join(data_folder, "*")
 data_files = sorted(map(os.path.basename, glob.glob(data_pattern)))
 
 # Define default setup parameters.
@@ -130,11 +131,14 @@ namespace_packages = [
 ]
 packages = [
     "mpl_toolkits.basemap",
-    "mpl_toolkits.basemap.data",
+    "mpl_toolkits.basemap_data",
 ]
-package_dirs = {"": "lib"}
+package_dirs = {
+    "mpl_toolkits.basemap": "lib/mpl_toolkits/basemap",
+    "mpl_toolkits.basemap_data": "lib/mpl_toolkits/basemap/data"
+}
 package_data = {
-    "mpl_toolkits.basemap.data":
+    "mpl_toolkits.basemap_data":
         data_files,
 }
 install_requires = get_install_requirements("requirements.txt")
@@ -146,8 +150,8 @@ if mode:
     data_version = "{0}.0{1}".format(version.rsplit(".", 1)[0], data_vbuild)
     regex = re.compile("(UScounties|_[ihf]\\.dat$)")
     if mode == "lite":
-        packages.remove("mpl_toolkits.basemap.data")
-        package_data.pop("mpl_toolkits.basemap.data")
+        packages.remove("mpl_toolkits.basemap_data")
+        package_data.pop("mpl_toolkits.basemap_data")
         install_requires.append("basemap-data == {0}".format(data_version))
     else:
         __version__ = data_version
@@ -157,7 +161,8 @@ if mode:
             data_files = [f for f in data_files if not regex.search(f)]
         elif mode == "extras":
             data_files = [f for f in data_files if regex.search(f)]
-        package_data["mpl_toolkits.basemap.data"] = data_files
+        package_data["mpl_toolkits.basemap_data"] = data_files
+        install_requires = []
 
 
 setup(**{
