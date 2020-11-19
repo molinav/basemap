@@ -15,6 +15,7 @@ heavy lifting), and the following functions:
 :func:`addcyclic`: Add cyclic (wraparound) point in longitude.
 """
 from distutils.version import LooseVersion
+import six
 
 try:
     from urllib import urlretrieve
@@ -4437,18 +4438,18 @@ f=image" %\
         lon_0 = ((lon0+360) % 360) - 360
         if lat0>0:
             if lon>0:
-                lonlatstr = u'%g\N{DEGREE SIGN}N, %g\N{DEGREE SIGN}E' % (lat0,lon_0)
+                lonlatstr = six.u('%g\N{DEGREE SIGN}N, %g\N{DEGREE SIGN}E' % (lat0,lon_0))
             elif lon<0:
-                lonlatstr = u'%g\N{DEGREE SIGN}N, %g\N{DEGREE SIGN}W' % (lat0,lon_0)
+                lonlatstr = six.u('%g\N{DEGREE SIGN}N, %g\N{DEGREE SIGN}W' % (lat0,lon_0))
             else:
-                lonlatstr = u'%g\N{DEGREE SIGN}, %g\N{DEGREE SIGN}W' % (lat0,lon_0)
+                lonlatstr = six.u('%g\N{DEGREE SIGN}, %g\N{DEGREE SIGN}W' % (lat0,lon_0))
         else:
             if lon>0:
-                lonlatstr = u'%g\N{DEGREE SIGN}S, %g\N{DEGREE SIGN}E' % (lat0,lon_0)
+                lonlatstr = six.u('%g\N{DEGREE SIGN}S, %g\N{DEGREE SIGN}E' % (lat0,lon_0))
             elif lon<0:
-                lonlatstr = u'%g\N{DEGREE SIGN}S, %g\N{DEGREE SIGN}W' % (lat0,lon_0)
+                lonlatstr = six.u('%g\N{DEGREE SIGN}S, %g\N{DEGREE SIGN}W' % (lat0,lon_0))
             else:
-                lonlatstr = u'%g\N{DEGREE SIGN}S, %g\N{DEGREE SIGN}' % (lat0,lon_0)
+                lonlatstr = six.u('%g\N{DEGREE SIGN}S, %g\N{DEGREE SIGN}' % (lat0,lon_0))
         # left edge of scale
         lon1,lat1 = self(x0-length/2,y0,inverse=True)
         x1,y1 = self(lon1,lat1)
@@ -5231,9 +5232,9 @@ def _setlonlab(fmt,lon,labelstyle):
                     lonlabstr = r'${%s\/^{\circ}\/W}$'%fmt
             else:
                 if labelstyle=='+/-':
-                    lonlabstr = u'-%s\N{DEGREE SIGN}'%fmt
+                    lonlabstr = six.u('-%s\N{DEGREE SIGN}'%fmt)
                 else:
-                    lonlabstr = u'%s\N{DEGREE SIGN}W'%fmt
+                    lonlabstr = six.u('%s\N{DEGREE SIGN}W'%fmt)
             lonlab = lonlabstr%np.fabs(lon-360)
         elif lon<180 and lon != 0:
             if rcParams['text.usetex']:
@@ -5243,15 +5244,15 @@ def _setlonlab(fmt,lon,labelstyle):
                     lonlabstr = r'${%s\/^{\circ}\/E}$'%fmt
             else:
                 if labelstyle=='+/-':
-                    lonlabstr = u'+%s\N{DEGREE SIGN}'%fmt
+                    lonlabstr = six.u('+%s\N{DEGREE SIGN}'%fmt)
                 else:
-                    lonlabstr = u'%s\N{DEGREE SIGN}E'%fmt
+                    lonlabstr = six.u('%s\N{DEGREE SIGN}E'%fmt)
             lonlab = lonlabstr%lon
         else:
             if rcParams['text.usetex']:
                 lonlabstr = r'${%s\/^{\circ}}$'%fmt
             else:
-                lonlabstr = u'%s\N{DEGREE SIGN}'%fmt
+                lonlabstr = six.u('%s\N{DEGREE SIGN}'%fmt)
             lonlab = lonlabstr%lon
     return lonlab
 
@@ -5268,9 +5269,9 @@ def _setlatlab(fmt,lat,labelstyle):
                     latlabstr = r'${%s\/^{\circ}\/S}$'%fmt
             else:
                 if labelstyle=='+/-':
-                    latlabstr = u'-%s\N{DEGREE SIGN}'%fmt
+                    latlabstr = six.u('-%s\N{DEGREE SIGN}'%fmt)
                 else:
-                    latlabstr = u'%s\N{DEGREE SIGN}S'%fmt
+                    latlabstr = six.u('%s\N{DEGREE SIGN}S'%fmt)
             latlab = latlabstr%np.fabs(lat)
         elif lat>0:
             if rcParams['text.usetex']:
@@ -5280,14 +5281,14 @@ def _setlatlab(fmt,lat,labelstyle):
                     latlabstr = r'${%s\/^{\circ}\/N}$'%fmt
             else:
                 if labelstyle=='+/-':
-                    latlabstr = u'+%s\N{DEGREE SIGN}'%fmt
+                    latlabstr = six.u('+%s\N{DEGREE SIGN}'%fmt)
                 else:
-                    latlabstr = u'%s\N{DEGREE SIGN}N'%fmt
+                    latlabstr = six.u('%s\N{DEGREE SIGN}N'%fmt)
             latlab = latlabstr%lat
         else:
             if rcParams['text.usetex']:
                 latlabstr = r'${%s\/^{\circ}}$'%fmt
             else:
-                latlabstr = u'%s\N{DEGREE SIGN}'%fmt
+                latlabstr = six.u('%s\N{DEGREE SIGN}'%fmt)
             latlab = latlabstr%lat
     return latlab
