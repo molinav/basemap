@@ -11,6 +11,7 @@ import sys
 from setuptools import setup
 from setuptools.dist import Distribution
 from setuptools.extension import Extension
+from Cython.Build import cythonize
 __version__ = "1.3.0"
 
 if sys.version_info < (2, 6):
@@ -143,6 +144,11 @@ package_data = {
         data_files,
 }
 install_requires = get_install_requirements("requirements.txt")
+if sys.version_info[:2] == (3, 2):
+    # Hack for Python 3.2 because pip < 8 cannot handle version markers.
+    marker = '; python_version == "3.2"'
+    install_requires = [item.replace(marker, "") for item in install_requires
+                        if item.startswith("six") or item.endswith(marker)]
 
 # Filter the data files depending on the mode (normal, lite, data, extras).
 if mode:
@@ -164,7 +170,6 @@ if mode:
             data_files = [f for f in data_files if regex.search(f)]
         package_data["mpl_toolkits.basemap_data"] = data_files
         install_requires = []
-
 
 setup(**{
     "name":
@@ -237,7 +242,7 @@ examples of what it can do.""",
     "package_data":
         package_data,
     "ext_modules":
-        extensions,
+        cythonize(extensions),
     "python_requires":
         ", ".join([
             ">= 2.6",
