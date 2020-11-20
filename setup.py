@@ -11,6 +11,7 @@ import sys
 from setuptools import setup
 from setuptools.dist import Distribution
 from setuptools.extension import Extension
+from Cython.Build import cythonize
 __version__ = "1.3.0"
 
 if sys.version_info < (2, 6):
@@ -121,8 +122,10 @@ if mode and "sdist" in sys.argv[1:]:
     raise ValueError("setup option --mode incompatible with sdist")
 
 # Get the basemap data files.
-data_pattern = os.path.join("lib", "mpl_toolkits", "basemap", "data", "*")
+data_folder = os.path.join("lib", "mpl_toolkits", "basemap_data")
+data_pattern = os.path.join(data_folder, "*")
 data_files = sorted(map(os.path.basename, glob.glob(data_pattern)))
+data_files = [item for item in data_files if not item.endswith(".py")]
 
 # Define default setup parameters.
 namespace_packages = [
@@ -130,14 +133,22 @@ namespace_packages = [
 ]
 packages = [
     "mpl_toolkits.basemap",
-    "mpl_toolkits.basemap.data",
+    "mpl_toolkits.basemap_data",
 ]
-package_dirs = {"": "lib"}
+package_dirs = {
+    "mpl_toolkits.basemap": "lib/mpl_toolkits/basemap",
+    "mpl_toolkits.basemap_data": data_folder,
+}
 package_data = {
-    "mpl_toolkits.basemap.data":
+    "mpl_toolkits.basemap_data":
         data_files,
 }
 install_requires = get_install_requirements("requirements.txt")
+if sys.version_info[:2] == (3, 2):
+    # Hack for Python 3.2 because pip < 8 cannot handle version markers.
+    marker = '; python_version == "3.2"'
+    install_requires = [item.replace(marker, "") for item in install_requires
+                        if item.startswith("six") or item.endswith(marker)]
 
 # Filter the data files depending on the mode (normal, lite, data, extras).
 if mode:
@@ -146,8 +157,8 @@ if mode:
     data_version = "{0}.0{1}".format(version.rsplit(".", 1)[0], data_vbuild)
     regex = re.compile("(UScounties|_[ihf]\\.dat$)")
     if mode == "lite":
-        packages.remove("mpl_toolkits.basemap.data")
-        package_data.pop("mpl_toolkits.basemap.data")
+        packages.remove("mpl_toolkits.basemap_data")
+        package_data.pop("mpl_toolkits.basemap_data")
         install_requires.append("basemap-data == {0}".format(data_version))
     else:
         __version__ = data_version
@@ -157,8 +168,8 @@ if mode:
             data_files = [f for f in data_files if not regex.search(f)]
         elif mode == "extras":
             data_files = [f for f in data_files if regex.search(f)]
-        package_data["mpl_toolkits.basemap.data"] = data_files
-
+        package_data["mpl_toolkits.basemap_data"] = data_files
+        install_requires = []
 
 setup(**{
     "name":
@@ -231,7 +242,7 @@ examples of what it can do.""",
     "package_data":
         package_data,
     "ext_modules":
-        extensions,
+        cythonize(extensions),
     "python_requires":
         ", ".join([
             ">= 2.6",
